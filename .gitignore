@@ -4,3 +4,5 @@ __pycache__/
 .env
 .venv
 waste_management.db
+ngrok.exe
+*.zip
