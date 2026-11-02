@@ -1,18 +1,21 @@
 @echo off
-chcp 65001 >nul
-title Smart Public Waste AI
+title Smart Public Waste AI Server
 echo ============================================================
-echo   Smart Public Waste AI - ระบบจำแนกประเภทขยะอัจฉริยะ
+echo   Smart Public Waste AI - Waste Sorting System
 echo ============================================================
 echo.
-echo กำลังเริ่มต้นระบบ Web Server...
-echo เข้าใช้งานผ่านเบราว์เซอร์:
-echo   - บนเครื่องนี้:  http://localhost:8000
-echo   - หรือเปิดหน้ากล้องเพื่อสแกน QR Code สำหรับมือถือ
+echo Starting Web Server...
+echo Open your browser at: http://localhost:8000
+echo Dashboard:            http://localhost:8000/dashboard
 echo.
-echo กด Ctrl + C เพื่อหยุดการทำงาน
+echo Press Ctrl+C to stop the server.
 echo ============================================================
 echo.
 
 python -m uvicorn app:app --host 0.0.0.0 --port 8000
+if %errorlevel% neq 0 (
+    echo.
+    echo [ERROR] Failed to start server.
+    echo.
+)
 pause
