@@ -1,16 +1,9 @@
-// Smart Public Waste AI - Client Application Logic
+// Smart Public Waste AI - Client Application Logic (Capture & Scan Mode)
 
 let videoStream = null;
 let currentFacingMode = "environment"; // Default to back camera for mobile
-let isDetecting = false;
-let detectionInterval = null;
 let confidenceThreshold = 0.35;
 let voiceEnabled = true;
-let lastSpokenClass = "";
-let lastSpokenTime = 0;
-let lastLoggedClass = "";
-let lastLoggedTime = 0;
-let consecutiveCount = 0;
 
 // DOM Elements
 const webcamVideo = document.getElementById('webcamVideo');
@@ -18,13 +11,15 @@ const detectionCanvas = document.getElementById('detectionCanvas');
 const snapshotCanvas = document.getElementById('snapshotCanvas');
 const cameraStandby = document.getElementById('cameraStandby');
 const liveBadge = document.getElementById('liveBadge');
-const fpsCounter = document.getElementById('fpsCounter');
 const btnFlipCamera = document.getElementById('btnFlipCamera');
 const btnCameraToggle = document.getElementById('btnCameraToggle');
 const cameraIcon = document.getElementById('cameraIcon');
 const cameraBtnText = document.getElementById('cameraBtnText');
 const confThresholdInput = document.getElementById('confThreshold');
 const confDisplay = document.getElementById('confDisplay');
+const btnCapture = document.getElementById('btnCapture');
+const btnRetake = document.getElementById('btnRetake');
+const scanOverlay = document.getElementById('scanOverlay');
 
 // Guidance Card Elements
 const mainResultCard = document.getElementById('mainResultCard');
@@ -71,10 +66,10 @@ async function startCamera() {
         });
 
         // Set canvas internal dimensions to match video
-        detectionCanvas.width = webcamVideo.videoWidth || 640;
-        detectionCanvas.height = webcamVideo.videoHeight || 480;
-        snapshotCanvas.width = 640;
-        snapshotCanvas.height = 480;
+        detectionCanvas.width = webcamVideo.videoWidth || 1280;
+        detectionCanvas.height = webcamVideo.videoHeight || 720;
+        snapshotCanvas.width = webcamVideo.videoWidth || 1280;
+        snapshotCanvas.height = webcamVideo.videoHeight || 720;
 
         // UI Updates
         cameraStandby.classList.add('opacity-0', 'pointer-events-none');
@@ -85,8 +80,10 @@ async function startCamera() {
         btnCameraToggle.classList.replace('bg-emerald-600', 'bg-red-600');
         btnCameraToggle.classList.replace('hover:bg-emerald-500', 'hover:bg-red-500');
 
-        isDetecting = true;
-        startDetectionLoop();
+        // Show Shutter Button & Hide Retake
+        btnCapture.classList.remove('hidden');
+        btnRetake.classList.add('hidden');
+        resetGuidanceCard();
     } catch (err) {
         console.error("Camera access failed:", err);
         alert("ไม่สามารถเข้าถึงกล้องได้: โปรดตรวจสอบสิทธิ์การใช้งานกล้องในเบราว์เซอร์");
@@ -94,12 +91,6 @@ async function startCamera() {
 }
 
 function stopCamera() {
-    isDetecting = false;
-    if (detectionInterval) {
-        clearInterval(detectionInterval);
-        detectionInterval = null;
-    }
-
     if (videoStream) {
         videoStream.getTracks().forEach(track => track.stop());
         videoStream = null;
@@ -120,6 +111,8 @@ function stopCamera() {
     btnCameraToggle.classList.replace('bg-red-600', 'bg-emerald-600');
     btnCameraToggle.classList.replace('hover:bg-red-500', 'hover:bg-emerald-500');
 
+    btnCapture.classList.add('hidden');
+    btnRetake.classList.add('hidden');
     resetGuidanceCard();
 }
 
@@ -143,40 +136,32 @@ function updateThreshold(val) {
     confDisplay.textContent = val + "%";
 }
 
-// 2. Detection Loop (Continuous Streaming)
-let isProcessingFrame = false;
-let frameCount = 0;
-let lastFpsTime = Date.now();
+// 2. Snapshot & Scan Logic (High Resolution & High Accuracy)
+async function takeSnapshotAndDetect() {
+    if (!videoStream || !webcamVideo.videoWidth) {
+        alert("กรุณาเปิดกล้องก่อนถ่ายรูปครับ");
+        return;
+    }
 
-function startDetectionLoop() {
-    if (detectionInterval) clearInterval(detectionInterval);
+    const w = webcamVideo.videoWidth;
+    const h = webcamVideo.videoHeight;
+    detectionCanvas.width = w;
+    detectionCanvas.height = h;
+    snapshotCanvas.width = w;
+    snapshotCanvas.height = h;
 
-    // Run inference every 300ms (~3.3 FPS for ultra-stable server load)
-    detectionInterval = setInterval(async () => {
-        if (!isDetecting || isProcessingFrame || !videoStream) return;
-        
-        isProcessingFrame = true;
-        await captureAndDetectFrame();
-        isProcessingFrame = false;
+    // Freeze snapshot on canvas
+    const ctx = detectionCanvas.getContext('2d');
+    ctx.drawImage(webcamVideo, 0, 0, w, h);
 
-        // Calculate FPS
-        frameCount++;
-        const now = Date.now();
-        if (now - lastFpsTime >= 1000) {
-            fpsCounter.textContent = `${frameCount} FPS`;
-            frameCount = 0;
-            lastFpsTime = now;
-        }
-    }, 300);
-}
-
-async function captureAndDetectFrame() {
-    if (!webcamVideo.videoWidth) return;
-
-    // Capture small snapshot for fast HTTP transmission
+    // Capture high quality frame for AI
     const snapCtx = snapshotCanvas.getContext('2d');
-    snapCtx.drawImage(webcamVideo, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
-    const base64Data = snapshotCanvas.toDataURL('image/jpeg', 0.65);
+    snapCtx.drawImage(webcamVideo, 0, 0, w, h);
+    const base64Data = snapshotCanvas.toDataURL('image/jpeg', 0.88);
+
+    // Show Scanning Loading Overlay
+    scanOverlay.classList.remove('hidden');
+    btnCapture.classList.add('hidden');
 
     try {
         const formData = new FormData();
@@ -188,25 +173,38 @@ async function captureAndDetectFrame() {
             body: formData
         });
 
-        if (!res.ok) return;
         const data = await res.json();
+        scanOverlay.classList.add('hidden');
 
         if (data.status === "success") {
             handleDetectionResults(data.detections || []);
+        } else {
+            alert("เกิดข้อผิดพลาดในการวิเคราะห์: " + (data.message || "Unknown"));
         }
     } catch (err) {
-        // Silently handle frame loss in live stream
+        scanOverlay.classList.add('hidden');
+        alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง");
+    } finally {
+        btnRetake.classList.remove('hidden');
     }
+}
+
+function retakePhoto() {
+    // Clear canvas
+    const ctx = detectionCanvas.getContext('2d');
+    ctx.clearRect(0, 0, detectionCanvas.width, detectionCanvas.height);
+
+    resetGuidanceCard();
+    btnRetake.classList.add('hidden');
+    btnCapture.classList.remove('hidden');
 }
 
 // 3. Render Results & Bounding Boxes
 function handleDetectionResults(detections) {
     const ctx = detectionCanvas.getContext('2d');
-    ctx.clearRect(0, 0, detectionCanvas.width, detectionCanvas.height);
 
     if (!detections || detections.length === 0) {
-        consecutiveCount = 0;
-        resetGuidanceCard();
+        showNoDetectionFeedback();
         return;
     }
 
@@ -214,7 +212,7 @@ function handleDetectionResults(detections) {
     detections.sort((a, b) => b.confidence - a.confidence);
     const topItem = detections[0];
 
-    // Draw Bounding Boxes on overlay canvas
+    // Draw Bounding Boxes on overlay canvas over frozen frame
     detections.forEach((det) => {
         const [normX1, normY1, normX2, normY2] = det.norm_box;
         const x = normX1 * detectionCanvas.width;
@@ -230,27 +228,51 @@ function handleDetectionResults(detections) {
 
         // Draw Box
         ctx.strokeStyle = strokeColor;
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 4;
         ctx.strokeRect(x, y, w, h);
 
         // Draw Tag Background
         const labelText = `${det.thai_name} (${det.confidence}%)`;
-        ctx.font = "bold 14px Prompt, sans-serif";
+        ctx.font = "bold 16px Prompt, sans-serif";
         const textWidth = ctx.measureText(labelText).width;
 
         ctx.fillStyle = strokeColor;
-        ctx.fillRect(x, Math.max(0, y - 24), textWidth + 12, 24);
+        ctx.fillRect(x, Math.max(0, y - 28), textWidth + 16, 28);
 
         // Draw Text
         ctx.fillStyle = "#ffffff";
-        ctx.fillText(labelText, x + 6, Math.max(16, y - 6));
+        ctx.fillText(labelText, x + 8, Math.max(20, y - 8));
     });
 
-    // Update the Guidance Card on the right with the top detection
+    // Update Guidance Card
     updateGuidanceCard(topItem);
 
-    // Handle Voice Feedback & Database Logging
-    handleVoiceAndLog(topItem);
+    // Speak Voice Alert
+    if (voiceEnabled && topItem.voice_alert) {
+        speakThai(topItem.voice_alert);
+    }
+
+    // Auto Log to Database
+    logToBackend(topItem);
+}
+
+function showNoDetectionFeedback() {
+    emptyState.classList.remove('hidden');
+    detectedState.classList.add('hidden');
+
+    emptyState.innerHTML = `
+        <div class="w-16 h-16 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-3xl mb-3 shadow-inner">
+            ⚠️
+        </div>
+        <h3 class="text-base md:text-lg font-bold text-amber-300">ไม่พบประเภทขยะในภาพนี้</h3>
+        <p class="text-xs text-slate-300 mt-1 max-w-xs leading-relaxed">
+            กรุณาถือกล้องนิ่งๆ ขยับเข้าใกล้วัตถุมากขึ้น หรือปรับมุมแสง แล้วกดปุ่ม <b>"ถ่ายรูปใหม่"</b> อีกครั้งครับ
+        </p>
+    `;
+
+    if (voiceEnabled) {
+        speakThai("ไม่พบประเภทขยะในภาพค่ะ กรุณาถ่ายใหม่อีกครั้ง");
+    }
 }
 
 function updateGuidanceCard(item) {
@@ -304,34 +326,21 @@ function updateGuidanceCard(item) {
 function resetGuidanceCard() {
     emptyState.classList.remove('hidden');
     detectedState.classList.add('hidden');
+    emptyState.innerHTML = `
+        <div class="w-16 h-16 rounded-2xl bg-slate-700/60 border border-slate-600 flex items-center justify-center text-3xl mb-3 shadow-inner">
+            📷
+        </div>
+        <h3 class="text-base md:text-lg font-bold text-slate-200">พร้อมถ่ายรูปสแกนขยะ</h3>
+        <p class="text-xs text-slate-400 mt-1 max-w-xs">นำขยะมาจ่อหน้ากล้องในระยะ 30-80 ซม. แล้วกดปุ่ม "ถ่ายรูปเพื่อสแกนขยะ"</p>
+    `;
     resultGlow.className = "absolute -top-24 -right-24 w-48 h-48 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none transition-all";
 }
 
-// 4. Voice Feedback & Debounced DB Logging
-function handleVoiceAndLog(item) {
-    const now = Date.now();
-
-    // Voice announcement (Every 4 seconds or when class changes)
-    if (voiceEnabled && item.voice_alert) {
-        if (item.thai_name !== lastSpokenClass || (now - lastSpokenTime) > 4500) {
-            speakThai(item.voice_alert);
-            lastSpokenClass = item.thai_name;
-            lastSpokenTime = now;
-        }
-    }
-
-    // Auto Log to Database (Prevent duplicate logging within 5 seconds for same object)
-    if (item.thai_name !== lastLoggedClass || (now - lastLoggedTime) > 5000) {
-        logToBackend(item);
-        lastLoggedClass = item.thai_name;
-        lastLoggedTime = now;
-    }
-}
-
+// 4. Voice Feedback
 function speakThai(text) {
     if (!('speechSynthesis' in window)) return;
     try {
-        synth.cancel(); // Stop prior audio
+        synth.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'th-TH';
         utterance.rate = 1.05;
@@ -376,7 +385,6 @@ async function logToBackend(item) {
             body: formData
         });
 
-        // Refresh today's summary stats
         fetchQuickStats();
     } catch (e) {
         console.warn("Auto-log failed:", e);

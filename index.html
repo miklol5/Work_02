@@ -82,13 +82,20 @@
                     <video id="webcamVideo" autoplay playsinline muted class="absolute inset-0 w-full h-full object-cover"></video>
                     <canvas id="detectionCanvas" class="absolute inset-0 w-full h-full object-cover pointer-events-none z-10"></canvas>
                     
-                    <!-- Camera Standby Placeholder -->
+                    <!-- Scanning Loading Overlay -->
+                    <div id="scanOverlay" class="hidden absolute inset-0 bg-slate-900/80 backdrop-blur-sm flex flex-col items-center justify-center z-25 transition-all">
+                        <div class="w-12 h-12 rounded-full border-4 border-emerald-500 border-t-transparent animate-spin mb-3"></div>
+                        <p class="text-white font-bold text-sm tracking-wide">กำลังวิเคราะห์ประเภทขยะด้วย AI...</p>
+                        <p class="text-xs text-slate-400 mt-1">กรุณาถือกล้องนิ่งๆ</p>
+                    </div>
+
+                    <!-- Camera Standby / Loading Placeholder -->
                     <div id="cameraStandby" class="absolute inset-0 bg-slate-900/90 flex flex-col items-center justify-center p-6 text-center z-20 transition-opacity duration-300">
                         <div class="w-16 h-16 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 text-2xl mb-4">
                             <i class="fa-solid fa-camera"></i>
                         </div>
                         <h3 class="text-base md:text-lg font-semibold text-white mb-1">กล้องพร้อมใช้งาน</h3>
-                        <p class="text-xs md:text-sm text-slate-400 max-w-sm mb-4">กดปุ่ม "เปิดกล้องส่องขยะ" เพื่อเริ่มสตรีมและวิเคราะห์ประเภทขยะแบบเรียลไทม์</p>
+                        <p class="text-xs md:text-sm text-slate-400 max-w-sm mb-4">กดปุ่ม "เปิดกล้อง" ด้านล่าง แล้วถือส่องขยะและกดปุ่มถ่ายรูปเพื่อวิเคราะห์</p>
                         <button onclick="startCamera()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-medium shadow-lg shadow-emerald-500/25 transition transform active:scale-95 flex items-center gap-2">
                             <i class="fa-solid fa-play"></i>
                             <span>เปิดกล้องส่องขยะ</span>
@@ -97,15 +104,26 @@
 
                     <!-- Live Status Badge on Video -->
                     <div id="liveBadge" class="hidden absolute top-3 left-3 z-30 flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 text-xs">
-                        <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-                        <span class="w-2 h-2 rounded-full bg-red-500 absolute"></span>
-                        <span class="font-medium text-white tracking-wide pl-2">LIVE AI</span>
-                        <span id="fpsCounter" class="text-slate-400 text-[10px] pl-1 border-l border-slate-600">-- FPS</span>
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span class="font-medium text-white tracking-wide pl-1">CAMERA ON</span>
                     </div>
 
                     <!-- Flip Camera Button (Always visible on mobile) -->
                     <button id="btnFlipCamera" onclick="flipCamera()" class="hidden absolute top-3 right-3 z-30 p-2.5 rounded-full bg-black/60 backdrop-blur-md text-white border border-white/20 hover:bg-black/80 transition active:scale-90" title="สลับกล้องหน้า/หลัง">
                         <i class="fa-solid fa-camera-rotate"></i>
+                    </button>
+                </div>
+
+                <!-- Shutter / Snapshot Action Section -->
+                <div class="mt-3 flex flex-col gap-2">
+                    <button id="btnCapture" onclick="takeSnapshotAndDetect()" class="hidden w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-base md:text-lg shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2.5 active:scale-95 transition transform cursor-pointer">
+                        <i class="fa-solid fa-camera text-xl"></i>
+                        <span>กดถ่ายรูปเพื่อสแกนขยะ</span>
+                    </button>
+
+                    <button id="btnRetake" onclick="retakePhoto()" class="hidden w-full py-3.5 px-6 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-base md:text-lg shadow-lg flex items-center justify-center gap-2 active:scale-95 transition transform cursor-pointer border border-slate-600">
+                        <i class="fa-solid fa-arrows-rotate text-emerald-400"></i>
+                        <span>ถ่ายรูปใหม่ / สแกนชิ้นถัดไป</span>
                     </button>
                 </div>
 
