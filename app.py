@@ -2,6 +2,7 @@ import os
 import base64
 import io
 import socket
+import time
 from typing import Optional
 from fastapi import FastAPI, Request, UploadFile, File, Form
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -17,6 +18,15 @@ from classifier import detect_waste, classify_detection, reload_model, get_activ
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 app = FastAPI(title="Smart Public Waste Sorting System")
+
+# Prevent browser from aggressively caching scripts, styles and templates
+@app.middleware("http")
+async def add_no_cache_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
 
 # Enable CORS for mobile phone access on local network
 app.add_middleware(
@@ -55,7 +65,7 @@ async def read_root(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="index.html",
-        context={"local_ip": local_ip, "port": 8000}
+        context={"local_ip": local_ip, "port": 8000, "cache_bust": int(time.time())}
     )
 
 @app.get("/dashboard", response_class=HTMLResponse)
@@ -64,7 +74,7 @@ async def read_dashboard(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="dashboard.html",
-        context={"local_ip": local_ip, "port": 8000}
+        context={"local_ip": local_ip, "port": 8000, "cache_bust": int(time.time())}
     )
 
 @app.post("/api/detect")
