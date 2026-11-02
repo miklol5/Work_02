@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+*.crdownload
+.env
+.venv
+waste_management.db

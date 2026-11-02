@@ -40,6 +40,10 @@
 
             <!-- Action Buttons -->
             <div class="flex items-center space-x-2">
+                <button onclick="resetAllData()" class="px-3 py-1.5 rounded-lg bg-red-600/30 hover:bg-red-600/50 border border-red-500/40 text-xs md:text-sm font-medium transition flex items-center gap-1.5 text-red-300">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>รีเซ็ตข้อมูลทั้งหมด</span>
+                </button>
                 <button onclick="fetchDashboardData()" class="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-xs md:text-sm font-medium transition flex items-center gap-1.5 text-slate-200">
                     <i class="fa-solid fa-arrows-rotate"></i>
                     <span>รีเฟรชข้อมูล</span>
@@ -178,11 +182,12 @@
                             <th class="py-3 px-4">ประเภทถัง</th>
                             <th class="py-3 px-4">ความมั่นใจ</th>
                             <th class="py-3 px-4">ผลกระทบ CO₂</th>
+                            <th class="py-3 px-4 text-center">จัดการ</th>
                         </tr>
                     </thead>
                     <tbody id="logsTableBody" class="divide-y divide-slate-700/60">
                         <tr>
-                            <td colspan="5" class="py-8 text-center text-slate-500">
+                            <td colspan="6" class="py-8 text-center text-slate-500">
                                 กำลังโหลดข้อมูล...
                             </td>
                         </tr>
@@ -327,7 +332,7 @@
             if (!recentLogs || recentLogs.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="5" class="py-8 text-center text-slate-500">
+                        <td colspan="6" class="py-8 text-center text-slate-500">
                             ยังไม่มีประวัติการตรวจจับในระบบ
                         </td>
                     </tr>
@@ -355,8 +360,44 @@
                     <td class="py-3 px-4 text-slate-300">
                         ${log.co2_saved_g > 0 ? `+${log.co2_saved_g}g CO₂` : '-'}
                     </td>
+                    <td class="py-3 px-4 text-center">
+                        <button onclick="deleteLog(${log.id})" class="p-1 px-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 transition" title="ลบรายการนี้">
+                            <i class="fa-solid fa-trash text-xs"></i>
+                        </button>
+                    </td>
                 </tr>
             `).join('');
+        }
+
+        async function deleteLog(id) {
+            if (!confirm('ต้องการลบประวัติรายการนี้ใช่หรือไม่?')) return;
+            try {
+                const res = await fetch(`/api/logs/delete/${id}`, { method: 'POST' });
+                const json = await res.json();
+                if (json.status === 'success') {
+                    fetchDashboardData();
+                } else {
+                    alert('ไม่สามารถลบข้อมูลได้: ' + json.message);
+                }
+            } catch (err) {
+                alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+            }
+        }
+
+        async function resetAllData() {
+            if (!confirm('คำเตือน: คุณต้องการลบและรีเซ็ตประวัติการตรวจจับทั้งหมดใช่หรือไม่? (การกระทำนี้ไม่สามารถย้อนกลับได้)')) return;
+            try {
+                const res = await fetch('/api/logs/reset', { method: 'POST' });
+                const json = await res.json();
+                if (json.status === 'success') {
+                    alert('รีเซ็ตข้อมูลทั้งหมดเรียบร้อยแล้ว');
+                    fetchDashboardData();
+                } else {
+                    alert('ไม่สามารถรีเซ็ตได้: ' + json.message);
+                }
+            } catch (err) {
+                alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+            }
         }
 
         // Initial fetch and auto-refresh every 10 seconds
