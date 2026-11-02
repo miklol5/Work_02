@@ -51,9 +51,6 @@
                 <div>
                     <h1 class="text-lg md:text-xl font-bold tracking-tight text-white flex items-center gap-2">
                         Smart Public Waste AI
-                        <span class="text-xs bg-emerald-500/20 text-emerald-400 font-normal px-2 py-0.5 rounded-full border border-emerald-500/30">
-                            ตรวจจับสด
-                        </span>
                     </h1>
                     <p class="text-xs text-slate-400 hidden sm:block">ระบบจำแนกประเภทขยะอัจฉริยะเพื่อการจัดการสิ่งแวดล้อมในพื้นที่สาธารณะ</p>
                 </div>
@@ -145,13 +142,6 @@
                             <i class="fa-solid fa-arrows-rotate"></i>
                             <span class="hidden sm:inline">สลับกล้อง</span>
                         </button>
-                    </div>
-
-                    <!-- Threshold Slider -->
-                    <div class="flex items-center space-x-2 bg-slate-900/60 px-3 py-1.5 rounded-lg border border-slate-700">
-                        <label for="confThreshold" class="text-slate-400 whitespace-nowrap">ความไว AI:</label>
-                        <input id="confThreshold" type="range" min="20" max="85" value="35" class="w-20 md:w-28 accent-emerald-500 cursor-pointer" oninput="updateThreshold(this.value)">
-                        <span id="confDisplay" class="font-mono text-emerald-400 w-8 text-right">35%</span>
                     </div>
                 </div>
 

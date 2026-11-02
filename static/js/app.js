@@ -133,7 +133,9 @@ function flipCamera() {
 
 function updateThreshold(val) {
     confidenceThreshold = val / 100.0;
-    confDisplay.textContent = val + "%";
+    if (confDisplay) {
+        confDisplay.textContent = val + "%";
+    }
 }
 
 // 2. Snapshot & Scan Logic (High Resolution & High Accuracy)
