@@ -143,6 +143,9 @@ async function takeSnapshotAndDetect() {
         return;
     }
 
+    // Unlock audio playback immediately within user touch gesture
+    unlockAudioOnGesture();
+
     const w = webcamVideo.videoWidth;
     const h = webcamVideo.videoHeight;
     detectionCanvas.width = w;
@@ -248,8 +251,8 @@ function handleDetectionResults(detections) {
     updateGuidanceCard(topItem);
 
     // Speak Voice Alert
-    if (voiceEnabled && topItem.voice_alert) {
-        speakThai(topItem.voice_alert);
+    if (voiceEnabled) {
+        playVoiceAudio(topItem.audio_file, topItem.voice_alert);
     }
 
     // Auto Log to Database
@@ -271,7 +274,7 @@ function showNoDetectionFeedback() {
     `;
 
     if (voiceEnabled) {
-        speakThai("ไม่พบประเภทขยะในภาพค่ะ กรุณาถ่ายใหม่อีกครั้ง");
+        playVoiceAudio("/static/audio/not_found.mp3", "ไม่พบประเภทขยะในภาพค่ะ กรุณาถ่ายใหม่อีกครั้ง");
     }
 }
 
@@ -336,15 +339,56 @@ function resetGuidanceCard() {
     resultGlow.className = "absolute -top-24 -right-24 w-48 h-48 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none transition-all";
 }
 
-// 4. Voice Feedback
-function speakThai(text) {
+// 4. Voice Feedback (Dual Engine: Natural Human MP3 + Web Speech Fallback)
+const voiceAudio = new Audio();
+let audioUnlocked = false;
+
+function unlockAudioOnGesture() {
+    if (!audioUnlocked) {
+        try {
+            voiceAudio.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
+            voiceAudio.play().catch(() => {});
+            audioUnlocked = true;
+        } catch (e) {}
+    }
+}
+
+function playVoiceAudio(audioUrl, fallbackText) {
+    if (!voiceEnabled) return;
+
+    if (audioUrl) {
+        try {
+            voiceAudio.pause();
+            voiceAudio.currentTime = 0;
+            voiceAudio.src = audioUrl;
+            const playPromise = voiceAudio.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {
+                    speakFallbackThai(fallbackText);
+                });
+            }
+        } catch (e) {
+            speakFallbackThai(fallbackText);
+        }
+    } else {
+        speakFallbackThai(fallbackText);
+    }
+}
+
+function speakFallbackThai(text) {
     if (!('speechSynthesis' in window)) return;
     try {
-        synth.cancel();
+        window.speechSynthesis.cancel();
+        if (window.speechSynthesis.paused) {
+            window.speechSynthesis.resume();
+        }
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'th-TH';
-        utterance.rate = 1.05;
-        synth.speak(utterance);
+        utterance.rate = 1.0;
+        const voices = window.speechSynthesis.getVoices();
+        const thai = voices.find(v => v.lang && (v.lang.startsWith('th') || v.name.toLowerCase().includes('thai')));
+        if (thai) utterance.voice = thai;
+        window.speechSynthesis.speak(utterance);
     } catch (e) {
         console.warn("Speech synthesis error:", e);
     }
@@ -366,7 +410,10 @@ function toggleVoice() {
         voiceStatusText.textContent = "เสียงแนะนำ: ปิด";
         btn.classList.replace('bg-emerald-600/30', 'bg-slate-700');
         btn.classList.replace('text-emerald-300', 'text-slate-300');
-        synth.cancel();
+        try {
+            voiceAudio.pause();
+            window.speechSynthesis.cancel();
+        } catch (e) {}
     }
 }
 

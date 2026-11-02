@@ -21,6 +21,7 @@ WASTE_METADATA = {
         "icon": "📦",
         "instruction": "กรุณาพับกล่องให้แบนเพื่อประหยัดพื้นที่",
         "voice_alert": "กล่องกระดาษ ทิ้งลงถังขยะรีไซเคิลสีเหลืองค่ะ",
+        "audio_file": "/static/audio/cardboard.mp3",
         "co2_saved_g": 40.0
     },
     "paper": {
@@ -31,6 +32,7 @@ WASTE_METADATA = {
         "icon": "📄",
         "instruction": "รวบรวมไว้รีไซเคิล หลีกเลี่ยงอย่าให้เปียกน้ำ",
         "voice_alert": "กระดาษ ทิ้งลงถังขยะรีไซเคิลสีเหลืองค่ะ",
+        "audio_file": "/static/audio/paper.mp3",
         "co2_saved_g": 30.0
     },
     "plastic": {
@@ -41,6 +43,7 @@ WASTE_METADATA = {
         "icon": "🥤",
         "instruction": "เทของเหลวออกให้หมดและบีบขวดให้แบนก่อนทิ้ง",
         "voice_alert": "ขวดพลาสติก ทิ้งลงถังขยะรีไซเคิลสีเหลืองค่ะ",
+        "audio_file": "/static/audio/plastic.mp3",
         "co2_saved_g": 35.0
     },
     "metal": {
@@ -51,6 +54,7 @@ WASTE_METADATA = {
         "icon": "🥫",
         "instruction": "เทน้ำออก ล้างเล็กน้อยและบีบให้แบน",
         "voice_alert": "กระป๋องโลหะ ทิ้งลงถังขยะรีไซเคิลสีเหลืองค่ะ",
+        "audio_file": "/static/audio/metal.mp3",
         "co2_saved_g": 85.0
     },
     "glass": {
@@ -61,6 +65,7 @@ WASTE_METADATA = {
         "icon": "🍾",
         "instruction": "ระมัดระวังการแตก วางลงในถังอย่างเบามือ",
         "voice_alert": "ขวดแก้ว ทิ้งลงถังขยะรีไซเคิลสีเหลืองค่ะ",
+        "audio_file": "/static/audio/glass.mp3",
         "co2_saved_g": 50.0
     },
     "organic waste": {
@@ -71,6 +76,7 @@ WASTE_METADATA = {
         "icon": "🍎",
         "instruction": "แยกน้ำแกงออก สามารถนำไปทำปุ๋ยหมักชีวภาพได้",
         "voice_alert": "เศษอาหาร ขยะเปียก ทิ้งลงถังขยะอินทรีย์สีเขียวค่ะ",
+        "audio_file": "/static/audio/organic.mp3",
         "co2_saved_g": 20.0
     },
     "e-waste": {
@@ -81,6 +87,7 @@ WASTE_METADATA = {
         "icon": "🔋",
         "instruction": "มีสารเคมีและโลหะหนัก ห้ามทิ้งปนเด็ดขาด",
         "voice_alert": "ขยะอิเล็กทรอนิกส์ ขยะอันตราย ทิ้งลงถังขยะอันตรายสีแดงค่ะ",
+        "audio_file": "/static/audio/e-waste.mp3",
         "co2_saved_g": 0.0
     },
     "medical waste": {
@@ -91,6 +98,7 @@ WASTE_METADATA = {
         "icon": "💉",
         "instruction": "มัดปากถุงให้มิดชิด ทิ้งลงถังเฉพาะเพื่อป้องกันการแพร่เชื้อ",
         "voice_alert": "ขยะติดเชื้อ ทิ้งลงถังขยะติดเชื้อสีแดงค่ะ",
+        "audio_file": "/static/audio/medical.mp3",
         "co2_saved_g": 0.0
     }
 }
@@ -103,6 +111,7 @@ DEFAULT_METADATA = {
     "icon": "🗑️",
     "instruction": "ขยะที่ไม่สามารถรีไซเคิลได้ ทิ้งลงถังขยะทั่วไปเพื่อนำไปฝังกลบหรือกำจัด",
     "voice_alert": "ขยะทั่วไป ทิ้งลงถังขยะทั่วไปสีน้ำเงินค่ะ",
+    "audio_file": "/static/audio/general.mp3",
     "co2_saved_g": 0.0
 }
 
@@ -234,6 +243,7 @@ def detect_waste(image_np: np.ndarray, conf_threshold: float = 0.35) -> List[Dic
             "icon": meta["icon"],
             "instruction": meta["instruction"],
             "voice_alert": meta["voice_alert"],
+            "audio_file": meta.get("audio_file", "/static/audio/general.mp3"),
             "co2_saved_g": meta["co2_saved_g"],
             "confidence": round(conf * 100, 1),
             "box": [round(c, 1) for c in xyxy],
