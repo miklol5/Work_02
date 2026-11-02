@@ -252,7 +252,18 @@ function handleDetectionResults(detections) {
 
     // Speak Voice Alert
     if (voiceEnabled) {
-        playVoiceAudio(topItem.audio_file, topItem.voice_alert);
+        let audioUrl = topItem.audio_file;
+        if (!audioUrl) {
+            // Client-side fallback if server hasn't reloaded yet
+            const binAudioMap = {
+                'yellow': '/static/audio/plastic.mp3',
+                'green': '/static/audio/organic.mp3',
+                'red': '/static/audio/e-waste.mp3',
+                'blue': '/static/audio/general.mp3'
+            };
+            audioUrl = binAudioMap[topItem.bin_color] || '/static/audio/general.mp3';
+        }
+        playVoiceAudio(audioUrl, topItem.voice_alert);
     }
 
     // Auto Log to Database
