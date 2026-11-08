@@ -3,6 +3,13 @@ from typing import List, Dict, Any
 import numpy as np
 from ultralytics import YOLO
 
+try:
+    import torch
+    torch.set_num_threads(1)
+    torch.set_grad_enabled(False)
+except Exception:
+    pass
+
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "waste_yolov8.pt")
 
 # Waste classification definitions tailored for Thai public waste management standards
@@ -218,7 +225,7 @@ def detect_waste(image_np: np.ndarray, conf_threshold: float = 0.35) -> List[Dic
         return []
 
     try:
-        results = model(image_np, conf=conf_threshold, verbose=False)
+        results = model(image_np, conf=conf_threshold, imgsz=384, verbose=False)
     except Exception as e:
         print(f"Inference error: {e}")
         return []

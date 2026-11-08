@@ -115,6 +115,10 @@ async def api_detect(
         if image is None:
             return JSONResponse({"status": "error", "message": "No image provided"}, status_code=400)
 
+        # Downscale incoming mobile images immediately for 10x faster CPU inference
+        if image.width > 480 or image.height > 480:
+            image.thumbnail((480, 480), Image.Resampling.BILINEAR)
+
         image_np = np.array(image)
         detections = detect_waste(image_np, conf_threshold=conf_threshold)
 

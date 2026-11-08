@@ -180,8 +180,8 @@ async function takeSnapshotAndDetect() {
     const ctx = detectionCanvas.getContext('2d');
     ctx.drawImage(webcamVideo, 0, 0, w, h);
 
-    // Optimize snapshot image size (Max 640px) for 10x faster network upload & server processing
-    const MAX_DIM = 640;
+    // Optimize snapshot image size (Max 480px, 0.75 quality) for instant upload & 0.3s AI inference
+    const MAX_DIM = 480;
     let targetW = w;
     let targetH = h;
     if (targetW > MAX_DIM || targetH > MAX_DIM) {
@@ -197,7 +197,7 @@ async function takeSnapshotAndDetect() {
     snapshotCanvas.height = targetH;
     const snapCtx = snapshotCanvas.getContext('2d');
     snapCtx.drawImage(webcamVideo, 0, 0, targetW, targetH);
-    const base64Data = snapshotCanvas.toDataURL('image/jpeg', 0.80);
+    const base64Data = snapshotCanvas.toDataURL('image/jpeg', 0.75);
 
     // 3. Show Scanning Loading Overlay & switch buttons
     scanOverlay.classList.remove('hidden');
