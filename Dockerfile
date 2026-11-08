@@ -1,6 +1,6 @@
 FROM python:3.10-slim
 
-# Install system dependencies for OpenCV and media
+# Install system libraries for OpenCV
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 \
     libglib2.0-0 \
@@ -9,17 +9,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-# Install lightweight CPU-only PyTorch (reduces size from 5GB to ~200MB!)
-RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu
+# Upgrade pip and install lightweight CPU-only PyTorch (only ~150MB instead of 4GB!)
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir torch torchvision --extra-index-url https://download.pytorch.org/whl/cpu
 
-# Install requirements
+# Install remaining requirements
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy app code and models
+# Copy project files
 COPY . .
 
-# Hugging Face Spaces uses 7860, Render uses $PORT
 ENV PORT=7860
 EXPOSE 7860
 
