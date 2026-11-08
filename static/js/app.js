@@ -2,7 +2,7 @@
 
 let videoStream = null;
 let currentFacingMode = "environment"; // Default to back camera for mobile
-let confidenceThreshold = 0.35;
+let confidenceThreshold = 0.18; // Sensitive threshold for reliable Thai waste detection
 let voiceEnabled = true;
 
 // DOM Elements
@@ -315,36 +315,90 @@ function handleDetectionResults(detections) {
     detections.sort((a, b) => b.confidence - a.confidence);
     const topItem = detections[0];
 
-    // Draw Bounding Boxes on overlay canvas over frozen frame
+    // Dynamic scaling for bold, ultra-visible bounding boxes on all screens
+    const scaleFactor = Math.max(1, detectionCanvas.width / 450);
+    const strokeWidth = Math.max(5, Math.round(scaleFactor * 3.5));
+    const fontSize = Math.max(18, Math.round(scaleFactor * 12));
+
+    // Draw Prominent Bounding Boxes on overlay canvas over frozen frame
     detections.forEach((det) => {
         const [normX1, normY1, normX2, normY2] = det.norm_box;
         const x = normX1 * detectionCanvas.width;
         const y = normY1 * detectionCanvas.height;
         const w = (normX2 - normX1) * detectionCanvas.width;
         const h = (normY2 - normY1) * detectionCanvas.height;
+        const cornerLength = Math.max(16, Math.min(w * 0.25, h * 0.25, scaleFactor * 22));
 
         // Choose color
-        let strokeColor = "#2563eb"; // Blue
-        if (det.bin_color === "yellow") strokeColor = "#eab308";
-        if (det.bin_color === "green") strokeColor = "#16a34a";
-        if (det.bin_color === "red") strokeColor = "#dc2626";
+        let strokeColor = "#3b82f6"; // Blue
+        let fillRgba = "rgba(59, 130, 246, 0.18)";
+        if (det.bin_color === "yellow") {
+            strokeColor = "#eab308";
+            fillRgba = "rgba(234, 179, 8, 0.20)";
+        } else if (det.bin_color === "green") {
+            strokeColor = "#10b981";
+            fillRgba = "rgba(16, 185, 129, 0.20)";
+        } else if (det.bin_color === "red") {
+            strokeColor = "#ef4444";
+            fillRgba = "rgba(239, 68, 68, 0.22)";
+        }
 
-        // Draw Box
-        ctx.strokeStyle = strokeColor;
-        ctx.lineWidth = 4;
+        // 1. Semi-transparent colored fill inside box
+        ctx.fillStyle = fillRgba;
+        ctx.fillRect(x, y, w, h);
+
+        // 2. High-contrast dark shadow outline (ensures box is visible on bright objects)
+        ctx.strokeStyle = "rgba(0, 0, 0, 0.8)";
+        ctx.lineWidth = strokeWidth + 4;
         ctx.strokeRect(x, y, w, h);
 
-        // Draw Tag Background
-        const labelText = `${det.thai_name} (${det.confidence}%)`;
-        ctx.font = "bold 16px Prompt, sans-serif";
-        const textWidth = ctx.measureText(labelText).width;
+        // 3. Bright main border
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = strokeWidth;
+        ctx.strokeRect(x, y, w, h);
 
-        ctx.fillStyle = strokeColor;
-        ctx.fillRect(x, Math.max(0, y - 28), textWidth + 16, 28);
+        // 4. White Corner Brackets (AI HUD Focus corners)
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = strokeWidth + 1;
+        ctx.beginPath();
+        // Top-left
+        ctx.moveTo(x, y + cornerLength); ctx.lineTo(x, y); ctx.lineTo(x + cornerLength, y);
+        // Top-right
+        ctx.moveTo(x + w - cornerLength, y); ctx.lineTo(x + w, y); ctx.lineTo(x + w, y + cornerLength);
+        // Bottom-left
+        ctx.moveTo(x, y + h - cornerLength); ctx.lineTo(x, y + h); ctx.lineTo(x + cornerLength, y + h);
+        // Bottom-right
+        ctx.moveTo(x + w - cornerLength, y + h); ctx.lineTo(x + w, y + h); ctx.lineTo(x + w, y + cornerLength);
+        ctx.stroke();
 
-        // Draw Text
+        // 5. Large, Bold Thai Badge Tag
+        const badgeText = `${det.icon || '🏷️'} ${det.thai_name} (${det.confidence}%)`;
+        ctx.font = `bold ${fontSize}px Prompt, sans-serif`;
+        const textW = ctx.measureText(badgeText).width;
+        const padX = fontSize * 0.7;
+        const badgeW = textW + (padX * 2);
+        const badgeH = fontSize * 1.7;
+        const badgeY = y > badgeH + 6 ? y - 6 : y + h + badgeH + 6;
+
+        // Badge shadow & background
+        ctx.fillStyle = "rgba(15, 23, 42, 0.94)";
+        ctx.beginPath();
+        if (ctx.roundRect) {
+            ctx.roundRect(x, badgeY - badgeH, badgeW, badgeH, 6);
+        } else {
+            ctx.rect(x, badgeY - badgeH, badgeW, badgeH);
+        }
+        ctx.fill();
+
+        // Badge colored border
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = Math.max(2, Math.round(strokeWidth / 2));
+        ctx.stroke();
+
+        // Badge Text
         ctx.fillStyle = "#ffffff";
-        ctx.fillText(labelText, x + 8, Math.max(20, y - 8));
+        ctx.textBaseline = "middle";
+        ctx.fillText(badgeText, x + padX, badgeY - (badgeH / 2));
     });
 
     // Update Guidance Card

@@ -89,7 +89,7 @@ async def read_presentation(request: Request):
 @app.post("/api/detect")
 async def api_detect(
     image_base64: Optional[str] = Form(None),
-    conf_threshold: float = Form(0.35),
+    conf_threshold: float = Form(0.18),
     auto_log: bool = Form(False),
     file: Optional[UploadFile] = File(None)
 ):
