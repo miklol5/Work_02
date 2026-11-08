@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="th" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สไลด์นำเสนอ - Smart Public Waste AI</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        emerald: {
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts: Prompt -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Prompt', sans-serif; }
+        .slide { display: none; }
+        .slide.active { display: flex; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.99); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-emerald-500 selection:text-white">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 px-4 py-2.5 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center text-white text-lg shadow-md shadow-emerald-500/20">
+                <i class="fa-solid fa-recycle"></i>
+            </div>
+            <div>
+                <h1 class="text-sm md:text-base font-bold text-white tracking-tight flex items-center gap-2">
+                    Smart Public Waste AI
+                    <span class="text-[11px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30">Presentation</span>
+                </h1>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex items-center space-x-2">
+            <select id="slideSelect" onchange="goToSlide(parseInt(this.value))" class="bg-slate-800 text-slate-200 text-xs px-2.5 py-1.5 rounded-lg border border-slate-700 cursor-pointer focus:outline-none focus:border-emerald-500">
+                <option value="1">1. หน้าปกโครงการ</option>
+                <option value="2">2. ทำทำไม? (ปัญหาและแรงจูงใจ)</option>
+                <option value="3">3. ทำอะไร? (ภาพรวมระบบ)</option>
+                <option value="4">4. ทำยังไง? (Architecture & Tech Stack)</option>
+                <option value="5">5. มาตรฐานขยะ 4 ถังและระบบเสียง</option>
+                <option value="6">6. การใช้งาน: สแตนด์บาย</option>
+                <option value="7">7. การใช้งาน: กดถ่ายภาพ & ผลลัพธ์</option>
+                <option value="8">8. การใช้งาน: แดชบอร์ดสถิติ</option>
+                <option value="9">9. ผลกระทบและการประยุกต์ใช้</option>
+                <option value="10">10. สรุปและแผนพัฒนาต่อยอด</option>
+            </select>
+
+            <button onclick="toggleFullScreen()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs transition border border-slate-700" title="เต็มจอ (F11)">
+                <i class="fa-solid fa-expand"></i>
+            </button>
+
+            <a href="/" target="_blank" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                <span class="hidden sm:inline">เปิดแอปจริง</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Slide Container -->
+    <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6 flex flex-col justify-center">
+
+        <!-- SLIDE 1: TITLE SLIDE -->
+        <section id="slide-1" class="slide active flex-col items-center justify-center text-center py-10">
+            <div class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-white text-4xl shadow-xl shadow-emerald-500/25 mb-6 animate-bounce">
+                <i class="fa-solid fa-recycle"></i>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 mb-4">
+                โครงงานระบบอัจฉริยะเพื่อความยั่งยืนด้านสิ่งแวดล้อม
+            </span>
+            <h2 class="text-3xl md:text-5xl font-black text-white tracking-tight mb-4 leading-tight">
+                ระบบจำแนกประเภทขยะอัจฉริยะ<br>
+                <span class="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">เพื่อการจัดการสิ่งแวดล้อมในพื้นที่สาธารณะ</span>
+            </h2>
+            <p class="text-base md:text-lg text-slate-300 max-w-2xl mx-auto mb-8 font-light">
+                Smart Public Waste AI: ปัญญาประดิษฐ์ตรวจจับขยะด้วยภาพถ่ายนิ่ง (Photo Capture Mode) พร้อมระบบเสียงพูดแนะนำภาษาไทยและแดชบอร์ดสรุปผลสถิติแบบเรียลไทม์
+            </p>
+            <div class="flex flex-wrap items-center justify-center gap-3 text-xs md:text-sm text-slate-400">
+                <span class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800"><i class="fa-solid fa-microchip text-emerald-400 mr-1.5"></i>Ultralytics YOLOv8</span>
+                <span class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800"><i class="fa-solid fa-bolt text-teal-400 mr-1.5"></i>FastAPI (Python)</span>
+                <span class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800"><i class="fa-solid fa-volume-high text-cyan-400 mr-1.5"></i>Thai Web Speech</span>
+                <span class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800"><i class="fa-solid fa-mobile-screen text-amber-400 mr-1.5"></i>Mobile Responsive</span>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: WHY? -->
+        <section id="slide-2" class="slide flex-col justify-center py-6">
+            <div class="mb-4">
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Problem & Background</span>
+                <h2 class="text-2xl md:text-3xl font-black text-white">ทำทำไม? (Why: ที่มาและความสำคัญของปัญหา)</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
+                <div class="p-5 rounded-2xl bg-slate-900/90 border border-red-500/30 flex flex-col justify-between">
+                    <div>
+                        <div class="w-10 h-10 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center text-xl mb-3">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">วิกฤตขยะปนกันในพื้นที่สาธารณะ</h3>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            ประชาชนส่วนใหญ่มีความเร่งรีบ หรือไม่แน่ใจว่าบรรจุภัณฑ์ควรทิ้งลงถังสีอะไร จึงมักทิ้งรวมกัน ส่งผลให้ขยะรีไซเคิลเปรอะเปื้อนเศษอาหารและกลายเป็นขยะตกค้างที่รีไซเคิลไม่ได้
+                        </p>
+                    </div>
+                    <ul class="text-xs text-red-300/80 mt-4 space-y-1">
+                        <li>• ขยะกว่า 80% ในที่สาธารณะถูกทิ้งผิดถัง</li>
+                        <li>• ปริมาณขยะสู่หลุมฝังกลบ (Landfill) เพิ่มสูงขึ้นทุกปี</li>
+                    </ul>
+                </div>
+
+                <div class="p-5 rounded-2xl bg-slate-900/90 border border-emerald-500/30 flex flex-col justify-between">
+                    <div>
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl mb-3">
+                            <i class="fa-solid fa-bullseye"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">เป้าหมายและทางออกด้วย AI</h3>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            สร้างระบบ AI ตรวจจับขยะ ณ จุดทิ้ง ที่ใช้งานง่ายเพียงแค่กดถ่ายรูปภาพเดียว ระบบจะบอกสีถังขยะทันทีทั้งบนหน้าจอและส่งเสียงพูดภาษาไทย ช่วยลดข้อผิดพลาดตั้งแต่ต้นทาง
+                        </p>
+                    </div>
+                    <ul class="text-xs text-emerald-300/80 mt-4 space-y-1">
+                        <li>• คัดแยกถูกต้อง 100% ณ จุดทิ้ง</li>
+                        <li>• ช่วยลดการปล่อยก๊าซเรือนกระจก (CO2 Saved)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: WHAT? -->
+        <section id="slide-3" class="slide flex-col justify-center py-6">
+            <div class="mb-4">
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Solution Overview</span>
+                <h2 class="text-2xl md:text-3xl font-black text-white">ทำอะไร? (What: 4 ฟังก์ชันหลักของระบบ)</h2>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-2">
+                <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 transition">
+                    <div class="text-2xl text-emerald-400 mb-2"><i class="fa-solid fa-camera"></i></div>
+                    <h3 class="font-bold text-white text-base mb-1">โหมดกดถ่ายภาพ</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        เปลี่ยนจากเรียลไทม์ที่ภาพสั่นไหว มาเป็นโหมดกดถ่ายรูปนิ่ง (Freeze Frame) ภาพคมชัด แม่นยำ ไม่จับมั่ว
+                    </p>
+                </div>
+                <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 hover:border-yellow-500/50 transition">
+                    <div class="text-2xl text-yellow-400 mb-2"><i class="fa-solid fa-trash-can"></i></div>
+                    <h3 class="font-bold text-white text-base mb-1">แยกตรง 4 ถังสาธารณะ</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        จำแนกขยะออกเป็น 4 สีมาตรฐาน: เหลือง (รีไซเคิล), เขียว (เปียก), แดง (อันตราย), น้ำเงิน (ทั่วไป)
+                    </p>
+                </div>
+                <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 hover:border-teal-500/50 transition">
+                    <div class="text-2xl text-teal-400 mb-2"><i class="fa-solid fa-volume-high"></i></div>
+                    <h3 class="font-bold text-white text-base mb-1">เสียงแนะนำภาษาไทย</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        เปล่งเสียงบอกชื่อขยะและสีถังขยะทันที ช่วยเพิ่มความสะดวกและรองรับผู้มีปัญหาทางสายตา
+                    </p>
+                </div>
+                <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 hover:border-cyan-500/50 transition">
+                    <div class="text-2xl text-cyan-400 mb-2"><i class="fa-solid fa-chart-pie"></i></div>
+                    <h3 class="font-bold text-white text-base mb-1">แดชบอร์ดสถิติผู้บริหาร</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        บันทึกประวัติ, สัดส่วนขยะ (Pie Chart), ช่วงเวลาทิ้งขยะสูงสุด (Peak Hours) และคำนวณ CO2 ที่ลดได้
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: HOW? -->
+        <section id="slide-4" class="slide flex-col justify-center py-6">
+            <div class="mb-4">
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">System Architecture</span>
+                <h2 class="text-2xl md:text-3xl font-black text-white">ทำยังไง? (How: สถาปัตยกรรมระบบ & Tech Stack)</h2>
+            </div>
+            <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 mb-4">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-3 text-center text-xs">
+                    <div class="p-3 rounded-xl bg-slate-800 border border-slate-700">
+                        <i class="fa-solid fa-mobile-screen text-emerald-400 text-2xl mb-1.5 block"></i>
+                        <span class="font-bold block text-white">1. Client / UI</span>
+                        <span class="text-slate-400 text-[11px]">กล้องมือถือ / PC<br>Capture & Freeze</span>
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-800 border border-slate-700">
+                        <i class="fa-solid fa-network-wired text-cyan-400 text-2xl mb-1.5 block"></i>
+                        <span class="font-bold block text-white">2. LocalTunnel</span>
+                        <span class="text-slate-400 text-[11px]">HTTPS Tunnel<br>เปิดกล้องมือถือได้ปลอดภัย</span>
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-800 border border-slate-700">
+                        <i class="fa-solid fa-server text-teal-400 text-2xl mb-1.5 block"></i>
+                        <span class="font-bold block text-white">3. FastAPI Backend</span>
+                        <span class="text-slate-400 text-[11px]">Asynchronous API<br>Python 3.10</span>
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-800 border border-slate-700">
+                        <i class="fa-solid fa-brain text-yellow-400 text-2xl mb-1.5 block"></i>
+                        <span class="font-bold block text-white">4. YOLOv8 AI</span>
+                        <span class="text-slate-400 text-[11px]">Object Detection<br>waste_yolov8.pt</span>
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-800 border border-slate-700">
+                        <i class="fa-solid fa-database text-purple-400 text-2xl mb-1.5 block"></i>
+                        <span class="font-bold block text-white">5. SQLite DB</span>
+                        <span class="text-slate-400 text-[11px]">บันทึกประวัติการคัดแยก<br>& คำนวณสถิติ CO2</span>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-300">
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                    <span class="font-bold text-emerald-400 block mb-1">• การป้องกันภาพค้าง/แคช (Anti-Cache)</span>
+                    เซิร์ฟเวอร์ส่ง `Cache-Control: no-cache` พร้อมแนบ `?v=timestamp` เพื่อให้มั่นใจว่าเบราว์เซอร์ของผู้ใช้รันโค้ดเวอร์ชันล่าสุดเสมอ
+                </div>
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                    <span class="font-bold text-emerald-400 block mb-1">• ปลดล็อกเสียงบนมือถือ (Touch-to-Unlock)</span>
+                    ปลดล็อกออดิโอในจังหวะที่ผู้ใช้แตะปุ่มชัตเตอร์ ทำให้เสียงแนะนำภาษาไทยพูดออกลำโพงมือถือได้อย่างราบรื่น
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: TAXONOMY -->
+        <section id="slide-5" class="slide flex-col justify-center py-6">
+            <div class="mb-3">
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Classification Taxonomy</span>
+                <h2 class="text-2xl md:text-3xl font-black text-white">มาตรฐานการจำแนกขยะ 4 ถังสาธารณะ</h2>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 my-2">
+                <!-- Yellow -->
+                <div class="p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/30 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-2xl">🟡</span>
+                            <span class="text-xs font-bold text-yellow-400 bg-yellow-500/20 px-2 py-0.5 rounded">ถังรีไซเคิล</span>
+                        </div>
+                        <h3 class="font-bold text-white text-sm mb-1">ขยะรีไซเคิล (Recycle)</h3>
+                        <p class="text-xs text-slate-300 mb-2">ขวดพลาสติก, ขวดแก้ว, กระป๋อง, กระดาษ, ลัง</p>
+                    </div>
+                    <div class="border-t border-yellow-500/20 pt-2 text-[11px] text-yellow-300">
+                        <i class="fa-solid fa-volume-high mr-1"></i>"ขวดพลาสติก กรุณาทิ้งลงถังสีเหลือง ถังรีไซเคิลค่ะ"
+                    </div>
+                </div>
+
+                <!-- Green -->
+                <div class="p-4 rounded-xl bg-green-500/10 border border-green-500/30 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-2xl">🟢</span>
+                            <span class="text-xs font-bold text-green-400 bg-green-500/20 px-2 py-0.5 rounded">ถังขยะเปียก</span>
+                        </div>
+                        <h3 class="font-bold text-white text-sm mb-1">ขยะอินทรีย์ (Organic)</h3>
+                        <p class="text-xs text-slate-300 mb-2">เศษอาหาร, เปลือกผลไม้, เศษผัก, ใบไม้</p>
+                    </div>
+                    <div class="border-t border-green-500/20 pt-2 text-[11px] text-green-300">
+                        <i class="fa-solid fa-volume-high mr-1"></i>"ขยะอินทรีย์ กรุณาทิ้งลงถังสีเขียว ถังขยะเปียกค่ะ"
+                    </div>
+                </div>
+
+                <!-- Red -->
+                <div class="p-4 rounded-xl bg-red-500/10 border border-red-500/30 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-2xl">🔴</span>
+                            <span class="text-xs font-bold text-red-400 bg-red-500/20 px-2 py-0.5 rounded">ถังขยะอันตราย</span>
+                        </div>
+                        <h3 class="font-bold text-white text-sm mb-1">ขยะอันตราย (Hazardous)</h3>
+                        <p class="text-xs text-slate-300 mb-2">ถ่านไฟฉาย, ขยะอิเล็กทรอนิกส์, ขยะติดเชื้อ</p>
+                    </div>
+                    <div class="border-t border-red-500/20 pt-2 text-[11px] text-red-300">
+                        <i class="fa-solid fa-volume-high mr-1"></i>"ขยะอันตราย กรุณาทิ้งลงถังสีแดง ระวังสารพิษค่ะ"
+                    </div>
+                </div>
+
+                <!-- Blue -->
+                <div class="p-4 rounded-xl bg-blue-500/10 border border-blue-500/30 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-2xl">🔵</span>
+                            <span class="text-xs font-bold text-blue-400 bg-blue-500/20 px-2 py-0.5 rounded">ถังขยะทั่วไป</span>
+                        </div>
+                        <h3 class="font-bold text-white text-sm mb-1">ขยะทั่วไป (General)</h3>
+                        <p class="text-xs text-slate-300 mb-2">ซองขนม, กล่องโฟม, ถุงพลาสติกเปื้อน, หลอด</p>
+                    </div>
+                    <div class="border-t border-blue-500/20 pt-2 text-[11px] text-blue-300">
+                        <i class="fa-solid fa-volume-high mr-1"></i>"ขยะทั่วไป กรุณาทิ้งลงถังสีน้ำเงินค่ะ"
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: UI WALKTHROUGH 1 - STANDBY -->
+        <section id="slide-6" class="slide flex-col justify-center py-4">
+            <div class="mb-2">
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">UI Walkthrough • Step 1</span>
+                <h2 class="text-xl md:text-2xl font-black text-white">วิธีการใช้งาน: หน้าแรกและโหมดสแตนด์บาย</h2>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+                <div class="lg:col-span-8 rounded-xl overflow-hidden border border-slate-700 shadow-2xl bg-black">
+                    <img src="/static/screenshots/01_home_standby.png" alt="Desktop Standby Screen" class="w-full object-contain">
+                </div>
+                <div class="lg:col-span-4 space-y-2.5 text-xs">
+                    <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                        <span class="font-bold text-emerald-400 block mb-1">1. เปิดกล้องส่องขยะ</span>
+                        กดปุ่มสีเขียวเพื่อเริ่มเปิดกล้อง Webcam หรือกล้องมือถือ
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                        <span class="font-bold text-emerald-400 block mb-1">2. เลือกภาพจากเครื่อง</span>
+                        รองรับการอัปโหลดไฟล์รูปภาพ หรือกดถ่ายจากแอปกล้องมือถือโดยตรง
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                        <span class="font-bold text-emerald-400 block mb-1">3. ควบคุมเสียงแนะนำ</span>
+                        ปุ่มมุมบนขวาสำหรับเปิด/ปิดเสียง และสามารถแตะเพื่อทดสอบเสียงพูดได้
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 7: UI WALKTHROUGH 2 - DETECTION RESULT -->
+        <section id="slide-7" class="slide flex-col justify-center py-4">
+            <div class="mb-2">
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">UI Walkthrough • Step 2</span>
+                <h2 class="text-xl md:text-2xl font-black text-white">วิธีการใช้งาน: กดถ่ายภาพ & แสดงผลตรวจจับ</h2>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+                <div class="lg:col-span-8 rounded-xl overflow-hidden border border-slate-700 shadow-2xl bg-black">
+                    <img src="/static/screenshots/04_detection_result.png" alt="Detection Result Screen" class="w-full object-contain">
+                </div>
+                <div class="lg:col-span-4 space-y-2.5 text-xs">
+                    <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                        <span class="font-bold text-yellow-400 block mb-1">📸 กดถ่ายภาพ (Freeze Frame)</span>
+                        เมื่อกดปุ่มชัตเตอร์ ภาพจะหยุดนิ่งทันที AI ตีกรอบสีเหลืองระบุ `ขวดพลาสติก (94.8%)`
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                        <span class="font-bold text-yellow-400 block mb-1">🏷️ การ์ดสีถัง & ข้อแนะนำ</span>
+                        แสดงถังขยะรีไซเคิลสีเหลือง พร้อม Eco-Tip แนะนำให้เทน้ำและบีบขวดก่อนทิ้ง
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                        <span class="font-bold text-yellow-400 block mb-1">🔄 ถ่ายใหม่ / สแกนชิ้นถัดไป</span>
+                        ปุ่มเปลี่ยนเป็น "ถ่ายรูปใหม่" เพื่อคืนค่ากล้องกลับมาสตรีมพร้อมสแกนชิ้นถัดไป
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: UI WALKTHROUGH 3 - DASHBOARD -->
+        <section id="slide-8" class="slide flex-col justify-center py-4">
+            <div class="mb-2">
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">UI Walkthrough • Step 3</span>
+                <h2 class="text-xl md:text-2xl font-black text-white">วิธีการใช้งาน: แดชบอร์ดสรุปสถิติและข้อมูล</h2>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+                <div class="lg:col-span-8 rounded-xl overflow-hidden border border-slate-700 shadow-2xl bg-black">
+                    <img src="/static/screenshots/02_dashboard.png" alt="Dashboard Analytics Screen" class="w-full object-contain">
+                </div>
+                <div class="lg:col-span-4 space-y-2.5 text-xs">
+                    <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                        <span class="font-bold text-cyan-400 block mb-1">📊 4 ตัวชี้วัดสำคัญ</span>
+                        นับยอดรวมชิ้น, กิโลกรัม CO2 ที่ลดได้, % รีไซเคิล และเตือนขยะอันตราย
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                        <span class="font-bold text-cyan-400 block mb-1">🕒 Peak Hours Graph</span>
+                        กราฟแท่งวิเคราะห์ช่วงเวลาทิ้งขยะหนาแน่น ช่วยวางรอบการเก็บขยะ
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                        <span class="font-bold text-cyan-400 block mb-1">🗑️ จัดการประวัติ</span>
+                        มีปุ่มถังขยะลบรายการที่ตรวจผิดพลาด และปุ่มรีเซ็ตข้อมูลทั้งหมด
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 9: IMPACT -->
+        <section id="slide-9" class="slide flex-col justify-center py-6">
+            <div class="mb-4">
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Impact & Applications</span>
+                <h2 class="text-2xl md:text-3xl font-black text-white">ผลกระทบเชิงสิ่งแวดล้อมและการนำไปประยุกต์ใช้จริง</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-2">
+                <div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
+                    <div class="text-3xl text-emerald-400 mb-2"><i class="fa-solid fa-seedling"></i></div>
+                    <h3 class="font-bold text-white text-base mb-1">สิ่งแวดล้อม & คาร์บอน</h3>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        เพิ่มปริมาณขยะรีไซเคิลเข้าสู่ระบบหมุนเวียน ลดปริมาณขยะฝังกลบ และสามารถคำนวณการลดก๊าซเรือนกระจกได้อย่างเป็นรูปธรรม
+                    </p>
+                </div>
+                <div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
+                    <div class="text-3xl text-teal-400 mb-2"><i class="fa-solid fa-users"></i></div>
+                    <h3 class="font-bold text-white text-base mb-1">สังคม & การศึกษา</h3>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        ปลูกฝังพฤติกรรมและสุขนิสัยการคัดแยกขยะที่ถูกต้อง เสียงแนะนำภาษาไทยช่วยให้เด็ก ผู้สูงอายุ และผู้พิการใช้งานได้อย่างเท่าเทียม
+                    </p>
+                </div>
+                <div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
+                    <div class="text-3xl text-cyan-400 mb-2"><i class="fa-solid fa-city"></i></div>
+                    <h3 class="font-bold text-white text-base mb-1">เมืองอัจฉริยะ (Smart City)</h3>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        เหมาะสำหรับติดตั้งในสวนสาธารณะ มหาวิทยาลัย ศูนย์อาหาร ห้างสรรพสินค้า และโรงพยาบาล เพื่อเป็นต้นแบบการจัดการเมืองสีเขียว
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 10: CONCLUSION & FUTURE WORK -->
+        <section id="slide-10" class="slide flex-col justify-center py-6">
+            <div class="mb-4">
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Conclusion & Roadmap</span>
+                <h2 class="text-2xl md:text-3xl font-black text-white">สรุปผลโครงการและแผนพัฒนาต่อยอดในอนาคต</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
+                <div class="p-5 rounded-2xl bg-slate-900/90 border border-emerald-500/30">
+                    <h3 class="text-base font-bold text-emerald-400 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-check"></i>
+                        ความสำเร็จในปัจจุบัน (Completed)
+                    </h3>
+                    <ul class="text-xs text-slate-300 space-y-2">
+                        <li>✅ ระบบ Photo Capture ภาพนิ่งคมชัด หมดปัญหาจับมั่ว</li>
+                        <li>✅ จำแนกแม่นยำตามมาตรฐานถังขยะ 4 สีของประเทศไทย</li>
+                        <li>✅ ระบบเสียงภาษาไทยคมชัดทั้งคอมพิวเตอร์และมือถือ</li>
+                        <li>✅ มีแดชบอร์ดสถิติ Peak Hours และ CO2 Saved ครบถ้วน</li>
+                        <li>✅ ใช้งานได้ทั้ง Desktop และสมาร์ตโฟนผ่าน HTTPS Tunnel</li>
+                    </ul>
+                </div>
+
+                <div class="p-5 rounded-2xl bg-slate-900/90 border border-teal-500/30">
+                    <h3 class="text-base font-bold text-teal-400 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-rocket"></i>
+                        แผนพัฒนาในอนาคต (Future Roadmap)
+                    </h3>
+                    <ul class="text-xs text-slate-300 space-y-2">
+                        <li>🚀 <b>Smart Bin Integration:</b> เชื่อมต่อบอร์ด ESP32 เพื่อเปิดฝาถังขยะอัตโนมัติด้วยเซอร์โวมอเตอร์เมื่อตรวจพบขยะ</li>
+                        <li>🚀 <b>Fill-Level Sensors:</b> ติดตั้ง Ultrasonic Sensor แจ้งเตือนเมื่อถังขยะใกล้เต็มผ่าน LINE Notify</li>
+                        <li>🚀 <b>Green Points / Gamification:</b> ระบบสะสมแต้มแลกของรางวัลเมื่อทิ้งขยะถูกต้องเพื่อสร้างแรงจูงใจ</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation Footer -->
+    <footer class="bg-slate-900/80 backdrop-blur border-t border-slate-800 px-4 py-3 flex items-center justify-between sticky bottom-0 z-50">
+        <div class="flex items-center space-x-2">
+            <button id="btnPrev" onclick="prevSlide()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold transition flex items-center gap-2 border border-slate-700 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+                <i class="fa-solid fa-chevron-left"></i>
+                <span>ก่อนหน้า</span>
+            </button>
+            <button id="btnNext" onclick="nextSlide()" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-emerald-600/30 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+                <span>ถัดไป</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <!-- Slide Indicators -->
+        <div class="flex items-center space-x-1.5" id="dotsContainer">
+            <!-- Rendered by JS -->
+        </div>
+
+        <div class="text-xs text-slate-400 font-mono">
+            สไลด์ <span id="currentSlideNumber" class="text-emerald-400 font-bold">1</span> / 10
+        </div>
+    </footer>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 10;
+
+        function showSlide(index) {
+            if (index < 1) index = 1;
+            if (index > totalSlides) index = totalSlides;
+            currentSlide = index;
+
+            document.querySelectorAll('.slide').forEach((el, idx) => {
+                if (idx + 1 === currentSlide) {
+                    el.classList.add('active');
+                } else {
+                    el.classList.remove('active');
+                }
+            });
+
+            document.getElementById('currentSlideNumber').textContent = currentSlide;
+            document.getElementById('slideSelect').value = currentSlide;
+            document.getElementById('btnPrev').disabled = (currentSlide === 1);
+            document.getElementById('btnNext').disabled = (currentSlide === totalSlides);
+
+            updateDots();
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) showSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) showSlide(currentSlide - 1);
+        }
+
+        function goToSlide(index) {
+            showSlide(index);
+        }
+
+        function renderDots() {
+            const container = document.getElementById('dotsContainer');
+            container.innerHTML = '';
+            for (let i = 1; i <= totalSlides; i++) {
+                const dot = document.createElement('button');
+                dot.className = `w-2.5 h-2.5 rounded-full transition-all cursor-pointer ${i === currentSlide ? 'bg-emerald-400 w-6' : 'bg-slate-700 hover:bg-slate-600'}`;
+                dot.onclick = () => showSlide(i);
+                container.appendChild(dot);
+            }
+        }
+
+        function updateDots() {
+            renderDots();
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                prevSlide();
+            } else if (e.key === 'Home') {
+                showSlide(1);
+            } else if (e.key === 'End') {
+                showSlide(totalSlides);
+            }
+        });
+
+        // Initialize
+        renderDots();
+        showSlide(1);
+    </script>
+</body>
+</html>

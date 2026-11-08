@@ -77,6 +77,23 @@ async def read_dashboard(request: Request):
         context={"local_ip": local_ip, "port": 8000, "cache_bust": int(time.time())}
     )
 
+@app.get("/presentation", response_class=HTMLResponse)
+async def read_presentation(request: Request):
+    local_ip = get_local_ip()
+    return templates.TemplateResponse(
+        request=request,
+        name="presentation.html",
+        context={"local_ip": local_ip, "port": 8000, "cache_bust": int(time.time())}
+    )
+
+@app.get("/slide-mockup", response_class=HTMLResponse)
+async def read_slide_mockup(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="slide_mockup.html",
+        context={"request": request}
+    )
+
 @app.post("/api/detect")
 async def api_detect(
     image_base64: Optional[str] = Form(None),

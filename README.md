@@ -1,3 +1,13 @@
+---
+title: Smart Public Waste AI
+emoji: ♻️
+colorFrom: green
+colorTo: blue
+sdk: docker
+pinned: false
+app_port: 7860
+---
+
 # 🌿 ระบบจำแนกประเภทขยะอัจฉริยะเพื่อการจัดการสิ่งแวดล้อมในพื้นที่สาธารณะ
 ### Smart Public Waste Sorting AI System
 

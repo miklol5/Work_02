@@ -570,4 +570,63 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.addEventListener('click', () => {
         unlockAudioOnGesture();
     }, { once: true });
+
+    // Demo Mode for presentation and screenshot capture
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('demo') === '1') {
+        detectionCanvas.width = 1280;
+        detectionCanvas.height = 720;
+        const ctx = detectionCanvas.getContext('2d');
+        
+        // Draw realistic background and sample plastic bottle
+        ctx.fillStyle = "#0f172a";
+        ctx.fillRect(0, 0, 1280, 720);
+
+        // Table surface
+        ctx.fillStyle = "#1e293b";
+        ctx.beginPath();
+        ctx.ellipse(640, 560, 480, 140, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Bottle body
+        ctx.fillStyle = "rgba(56, 189, 248, 0.4)";
+        ctx.strokeStyle = "#38bdf8";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.roundRect(560, 220, 160, 310, [30, 30, 15, 15]);
+        ctx.fill();
+        ctx.stroke();
+
+        // Bottle neck & cap
+        ctx.fillStyle = "#0284c7";
+        ctx.fillRect(610, 160, 60, 60);
+        ctx.fillStyle = "#0ea5e9";
+        ctx.fillRect(600, 135, 80, 28);
+
+        // Water level inside bottle
+        ctx.fillStyle = "rgba(14, 165, 233, 0.6)";
+        ctx.beginPath();
+        ctx.roundRect(568, 320, 144, 202, [5, 5, 12, 12]);
+        ctx.fill();
+
+        cameraStandby.classList.add('opacity-0', 'pointer-events-none');
+        liveBadge.classList.remove('hidden');
+        liveBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span class="font-medium text-white tracking-wide pl-1">CAPTURED & SCANNED</span>';
+        btnCapture.classList.add('hidden');
+        btnRetake.classList.remove('hidden');
+
+        handleDetectionResults([{
+            raw_class: "plastic bottle",
+            thai_name: "ขวดพลาสติก / พลาสติกรีไซเคิล",
+            waste_type: "ขยะรีไซเคิล",
+            bin_color: "yellow",
+            bin_title: "ถังขยะรีไซเคิล (สีเหลือง)",
+            icon: "♻️",
+            instruction: "เทของเหลวออกให้หมด บีบขวดให้แบนก่อนทิ้งลงถังขยะรีไซเคิลสีเหลือง",
+            voice_alert: "ขวดพลาสติก กรุณาทิ้งลงถังสีเหลือง ถังรีไซเคิลค่ะ",
+            confidence: 94.8,
+            co2_saved_g: 35.0,
+            norm_box: [0.42, 0.16, 0.58, 0.78]
+        }]);
+    }
 });
