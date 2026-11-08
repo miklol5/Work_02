@@ -20,7 +20,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project files
 COPY . .
 
-ENV PORT=7860
-EXPOSE 7860
+# Google Cloud Run uses port 8080 by default
+ENV PORT=8080
+EXPOSE 8080
 
-CMD ["sh", "-c", "uvicorn app:app --host 0.0.0.0 --port ${PORT:-7860}"]
+CMD ["sh", "-c", "uvicorn app:app --host 0.0.0.0 --port ${PORT:-8080}"]

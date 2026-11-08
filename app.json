@@ -1,0 +1,8 @@
+{
+  "name": "smart-public-waste-ai",
+  "env": {
+    "PORT": {
+      "value": "8080"
+    }
+  }
+}
