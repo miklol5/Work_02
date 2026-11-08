@@ -8,3 +8,5 @@ ngrok.exe
 *.zip
 
 .vercel
+
+cloudflared.exe
