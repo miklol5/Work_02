@@ -1,6 +1,0 @@
-services:
-  - type: web
-    name: smart-public-waste-ai
-    env: docker
-    plan: free
-    autoDeploy: true
