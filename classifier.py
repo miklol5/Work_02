@@ -173,6 +173,15 @@ def get_model():
             print(f"Loading YOLO model from: {target_path} ...")
             _model = YOLO(target_path)
             _active_model_name = os.path.basename(target_path)
+            # Warm up model to eliminate initial latency
+            try:
+                import torch
+                torch.set_num_threads(2)
+                dummy = np.zeros((512, 512, 3), dtype=np.uint8)
+                _model(dummy, conf=0.5, imgsz=512, verbose=False)
+                print("Model warmed up successfully!")
+            except Exception:
+                pass
             return _model
         except Exception as e:
             print(f"Failed to load {target_path} ({e})")

@@ -176,13 +176,28 @@ async function takeSnapshotAndDetect() {
         webcamVideo.pause();
     } catch (e) {}
 
-    // 2. Draw frozen frame to overlay canvas & snapshot canvas
+    // 2. Draw frozen frame to overlay canvas
     const ctx = detectionCanvas.getContext('2d');
     ctx.drawImage(webcamVideo, 0, 0, w, h);
 
+    // Optimize snapshot image size (Max 640px) for 10x faster network upload & server processing
+    const MAX_DIM = 640;
+    let targetW = w;
+    let targetH = h;
+    if (targetW > MAX_DIM || targetH > MAX_DIM) {
+        if (targetW > targetH) {
+            targetH = Math.round((targetH * MAX_DIM) / targetW);
+            targetW = MAX_DIM;
+        } else {
+            targetW = Math.round((targetW * MAX_DIM) / targetH);
+            targetH = MAX_DIM;
+        }
+    }
+    snapshotCanvas.width = targetW;
+    snapshotCanvas.height = targetH;
     const snapCtx = snapshotCanvas.getContext('2d');
-    snapCtx.drawImage(webcamVideo, 0, 0, w, h);
-    const base64Data = snapshotCanvas.toDataURL('image/jpeg', 0.90);
+    snapCtx.drawImage(webcamVideo, 0, 0, targetW, targetH);
+    const base64Data = snapshotCanvas.toDataURL('image/jpeg', 0.80);
 
     // 3. Show Scanning Loading Overlay & switch buttons
     scanOverlay.classList.remove('hidden');
