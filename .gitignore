@@ -6,3 +6,5 @@ __pycache__/
 waste_management.db
 ngrok.exe
 *.zip
+
+.vercel
